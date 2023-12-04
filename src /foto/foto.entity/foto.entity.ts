@@ -1,24 +1,28 @@
-import { AlbumEntity } from '../../album/album.entity/album.entity';
+/* eslint-disable prettier/prettier */
 import {
   Column,
   Entity,
-  JoinTable,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { UsuarioEntity } from '../../usuario/usuario.entity/usuario.entity';
+import { AlbumEntity } from '../../album/album.entity/album.entity';
 
 @Entity()
-export class TrackEntity {
+export class FotoEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
   @Column()
-  nombre: string;
-
+  iso: number;
   @Column()
-  duracion: number;
+  velObturacion: number;
+  @Column()
+  apertura: number;
+  @Column()
+  fecha: Date;
 
-  @ManyToOne(() => AlbumEntity, (album) => album.tracks)
-  @JoinTable()
+  @ManyToOne(() => AlbumEntity, (album) => album.fotos)
   album: AlbumEntity;
+  @ManyToOne(() => UsuarioEntity, (usuario) => usuario.fotos)
+  usuario: UsuarioEntity;
 }

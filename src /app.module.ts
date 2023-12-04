@@ -1,33 +1,16 @@
+/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TrackModule } from './foto/foto.module';
-import { AlbumModule } from './album/album.module';
-import { UsuarioModule } from './usuario/usuario.module';
-import { UsuarioEntity } from './usuario/usuario.entity/usuario.entity';
-import { AlbumEntity } from './album/album.entity/album.entity';
-import { FotoEntity } from './foto/foto.entity/foto.entity';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { FotoService } from './foto/foto.service';
+import { UsuarioService } from './usuario/usuario.service';
+import { AlbumService } from './album/album.service';
+import { redSocialService } from './red-social/red-social.service';
+import { AlbumFotoModule } from './album-foto/album-foto.module/album-foto.module';
 
 @Module({
-  imports: [
-    TrackModule,
-    AlbumModule,
-    UsuarioModule,
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'postgres',
-      database: 'marketplace',
-      entities: [UsuarioEntity, FotoEntity, AlbumEntity],
-      dropSchema: true,
-      synchronize: true,
-      keepConnectionAlive: true,
-    }),
-  ],
+  imports: [AlbumFotoModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, FotoService, UsuarioService, AlbumService, redSocialService],
 })
 export class AppModule {}

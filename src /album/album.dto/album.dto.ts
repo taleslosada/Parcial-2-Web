@@ -1,19 +1,18 @@
-import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
-
+/* eslint-disable prettier/prettier */
+import {IsDate, IsNotEmpty, IsString} from 'class-validator';
 export class AlbumDto {
-  @IsString()
-  @IsNotEmpty()
-  readonly fechaInicio: Date;
 
-  @IsUrl()
-  @IsNotEmpty()
-  readonly fechaFin: Date;
+    @IsString()
+    @IsNotEmpty()
+    readonly titulo: string;
 
-  @IsString()
-  @IsNotEmpty()
-  readonly titulo: string;
+    @IsDate()
+    @IsNotEmpty()
+    readonly fechaInicio: Date;
 
-  @IsString()
-  @IsNotEmpty()
-  readonly id: string;
+    @IsDate()
+    @IsNotEmpty()
+    readonly fechaFin: Date;
+
 }
+ 

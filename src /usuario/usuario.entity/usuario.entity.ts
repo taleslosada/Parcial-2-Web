@@ -1,28 +1,24 @@
-import { RedSocialEntity } from '../redSocial/redSocial.entity';
-import { FotoEntity } from '../foto/foto.entity';
-import { Column, Entity, PrimaryGeneratedColumn, ManyToMany,OneToMany,ManyToOne, JoinTable} from 'typeorm';
-
-
-@Entity()
-export class UsuarioEntity{
-   
+import {
+    Column,
+    Entity,
+    OneToMany,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+  } from 'typeorm';
+  import { FotoEntity } from '../../foto/foto.entity/foto.entity';
+  import { redSocialEntity } from '../../red-social/red-social.entity/red-social.entity';
+  
+  @Entity()
+  export class UsuarioEntity {
     @PrimaryGeneratedColumn('uuid')
-    id: long;
-    
+    id: string;
     @Column()
     nombre: string;
-
     @Column()
     telefono: string;
-
-
-
-    @OneToMany(type => FotoEntity, foto => foto.usuario)
-    @JoinTable()
-    fotos: fotoEntity[];
-
-    @ManyToOne(type => RedSocialEntity, redSocial => redSocial.usuarios)
-    @JoinTable()
-    redSocial: RedSocialEntity[];
-
-}
+  
+    @OneToMany(() => FotoEntity, (foto) => foto.usuario)
+    fotos: FotoEntity[];
+    @ManyToOne(() => redSocialEntity, (redSocial) => redSocial.usuarios)
+    redSocial: redSocialEntity;
+  }

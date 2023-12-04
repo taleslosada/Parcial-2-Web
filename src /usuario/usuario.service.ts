@@ -1,45 +1,54 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
-import { UsuarioEntity } from './usuario.entity/usuario.entity';
-import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  BusinessLogicException,
-  BusinessError,
-} from '../shared/errors/business-errors';
+import { BusinessError, BusinessLogicException } from '../shared/errors/business-errors';
+import { Repository } from 'typeorm';
+import { UsuarioEntity } from './usuario.entity/usuario.entity';
 
 @Injectable()
 export class UsuarioService {
-  constructor(
-    @InjectRepository(UsuarioEntity)
-    private readonly usuarioRepository: Repository<UsuarioEntity>,
-  ) {}
+   constructor(
+       @InjectRepository(UsuarioEntity)
+       private readonly usuarioRepository: Repository<UsuarioEntity>
+   ){}
 
-  async create(usuario: UsuarioEntity): Promise<UsuarioEntity> {
-    if (usuario.telefono.length > 10) {
-      throw new BusinessLogicException(
-        'Telefono is too long, max 10 chars',
-        BusinessError.PRECONDITION_FAILED,
-      );
+   async findAll(): Promise<UsuarioEntity[]> {
+       return await this.usuarioRepository.find({ relations: ["fotos", "redSocial"] });
+   }
+
+   async findOne(id: string): Promise<UsuarioEntity> {
+       const usuario: UsuarioEntity = await this.usuarioRepository.findOne({where: {id}, relations: ["fotos", "redSocial"] } );
+       if (!usuario)
+         throw new BusinessLogicException("Usuario was not found", BusinessError.NOT_FOUND);
+  
+       return usuario;
+   }
+  
+   async create(usuario: UsuarioEntity): Promise<UsuarioEntity> {
+
+    if (usuario.telefono.length !== 10){
+        throw new BusinessLogicException("Telefono is to long, max 10 chars", BusinessError.BAD_REQUEST);
     }
+
     return await this.usuarioRepository.save(usuario);
-  }
+}
 
-  async findOne(id: string): Promise<UsuarioEntity> {
-    const usuario = await this.usuarioRepository.findOne({
-      where: { id },
-      relations: ['albums'],
-    });
-    console.log(usuario);
-    if (!usuario) {
-      throw new BusinessLogicException(
-        'Usuario was not found',
-        BusinessError.NOT_FOUND,
-      );
-    }
-    return usuario;
-  }
 
-  async findAll(): Promise<UsuarioEntity[]> {
-    return await this.usuarioRepository.find();
-  }
+async update(id: string, usuario: UsuarioEntity): Promise<UsuarioEntity> {
+    const persistedUsuario: UsuarioEntity = await this.usuarioRepository.findOne({where:{id}});
+    if (!persistedUsuario)
+      throw new BusinessLogicException("Usuario was not found", BusinessError.NOT_FOUND);
+    usuario.id = id; 
+    return await this.usuarioRepository.save(usuario);
+}
+
+async delete(id: string) {
+    const usuario: UsuarioEntity = await this.usuarioRepository.findOne({where:{id}});
+    if (!usuario)
+      throw new BusinessLogicException("Usuario was not found", BusinessError.NOT_FOUND);
+ 
+    await this.usuarioRepository.remove(usuario);
+}
+
+
 }

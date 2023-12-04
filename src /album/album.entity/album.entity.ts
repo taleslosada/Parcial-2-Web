@@ -1,32 +1,17 @@
-import { UsuarioEntity } from '../../usuario/usuario.entity/usuario.entity';
-import { TrackEntity } from '../../foto/foto.entity/foto.entity';
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  OneToMany,
-  ManyToMany,
-  JoinTable,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { FotoEntity } from '../../foto/foto.entity/foto.entity';
 
 @Entity()
 export class AlbumEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @Column()
-  fechaInicio: string;
-
-  @Column()
-  fechaFin: string;
   @Column()
   titulo: string;
-
-  @ManyToMany(() => UsuarioEntity, (usuario) => usuario.albums)
-  @JoinTable()
-  usuarios: UsuarioEntity[];
+  @Column()
+  fechaInicio: Date;
+  @Column()
+  fechaFin: Date;
 
   @OneToMany(() => FotoEntity, (foto) => foto.album)
-  @JoinTable()
-  foto: FotoEntity[];
+  fotos: FotoEntity[];
 }

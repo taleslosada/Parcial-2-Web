@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import {IsNotEmpty, IsString} from 'class-validator';
-export class UsuarioDto {
+export class redSocialDto {
 
     @IsString()
     @IsNotEmpty()
@@ -8,6 +8,7 @@ export class UsuarioDto {
 
     @IsString()
     @IsNotEmpty()
-    readonly telefono: string;
+    readonly slogan: string;
 
 }
+ 

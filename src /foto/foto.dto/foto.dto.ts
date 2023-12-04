@@ -1,22 +1,22 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
-
+/* eslint-disable prettier/prettier */
+import {IsDate, IsNotEmpty, IsNumber} from 'class-validator';
 export class FotoDto {
-  @IsString()
-  @IsNotEmpty()
-  readonly ISO: int;
-  @IsNumber()
-  @IsNotEmpty()
-  readonly velObturacion: string;
 
-  @IsNumber()
-  @IsNotEmpty()
-  readonly apertura: int;
+    @IsNumber()
+    @IsNotEmpty()
+    readonly iso: number;
 
-  @IsNumber()
-  @IsNotEmpty()
-  readonly fecha: string;
+    @IsNumber()
+    @IsNotEmpty()
+    readonly velObturacion: number;
 
-  @IsNumber()
-  @IsNotEmpty()
-  readonly id: long;
+    @IsNumber()
+    @IsNotEmpty()
+    readonly apertura: number;
+
+    @IsDate()
+    @IsNotEmpty()
+    readonly fecha: Date;
+
+
 }

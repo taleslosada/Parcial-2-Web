@@ -1,104 +1,60 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
-import { AlbumEntity } from './album.entity/album.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import {
   BusinessError,
   BusinessLogicException,
 } from '../shared/errors/business-errors';
-import { UsuarioEntity } from '../usuario/usuario.entity/usuario.entity';
+import { Repository } from 'typeorm';
+import { AlbumEntity } from './album.entity/album.entity';
 
 @Injectable()
 export class AlbumService {
-  constructor(
-    @InjectRepository(AlbumEntity)
-    private readonly albumRepository: Repository<AlbumEntity>,
-    @InjectRepository(UsuarioEntity)
-    private readonly usuarioRepository: Repository<UsuarioEntity>,
-  ) {}
+   constructor(
+       @InjectRepository(AlbumEntity)
+       private readonly albumRepository: Repository<AlbumEntity>
+   ){}
 
-  async create(album: AlbumEntity): Promise<AlbumEntity> {
+   async findAll(): Promise<AlbumEntity[]> {
+       return await this.albumRepository.find({ relations: ["fotos"] });
+   }
+
+   async findOne(id: string): Promise<AlbumEntity> {
+       const album: AlbumEntity = await this.albumRepository.findOne({where: {id}, relations: ["fotos"] } );
+       if (!album)
+         throw new BusinessLogicException("album was not found", BusinessError.NOT_FOUND);
+  
+       return album;
+   }
+  
+   async create(album: AlbumEntity): Promise<AlbumEntity> {
     if (!album.titulo) {
-      throw new BusinessLogicException(
-        'Album name cannot be empty',
-        BusinessError.PRECONDITION_FAILED,
-      );
+        throw new BusinessLogicException("the album title cannot be empty", BusinessError.VALIDATION_ERROR);
     }
-    if (!album.fechaInicio) {
-      throw new BusinessLogicException(
-        'Album description cannot be empty',
-        BusinessError.PRECONDITION_FAILED,
-      );
-    }
-    return await this.albumRepository.save(album);
-  }
-
-  async findOne(id: string): Promise<AlbumEntity> {
-    const album = await this.albumRepository.findOne({
-      where: { id },
-      relations: ['usuarios'],
-    });
-
-    if (!album) {
-      throw new BusinessLogicException(
-        'Album was not found',
-        BusinessError.NOT_FOUND,
-      );
-    }
-    return album;
-  }
-
-  async findAll(): Promise<AlbumEntity[]> {
-    return await this.albumRepository.find();
-  }
-
-  async delete(id: string) {
-    const album: AlbumEntity = await this.albumRepository.findOne({
-      where: { id },
-    });
-    if (!album) {
-      throw new BusinessLogicException(
-        'Album was not found',
-        BusinessError.NOT_FOUND,
-      );
-    }
-
-    if (album.foto) {
-      throw new BusinessLogicException(
-        'Album cannot be deleted because it has foto',
-        BusinessError.PRECONDITION_FAILED,
-      );
-    }
-
-    await this.albumRepository.remove(album);
-  }
-
-  async addUsuarioToAlbum(albumId: string, usuarioId: string) {
-    const album = await this.albumRepository.findOne({
-      where: { id: albumId },
-      relations: ['usuario'],
-    });
-    if (!album) {
-      throw new BusinessLogicException(
-        'Album was not found',
-        BusinessError.NOT_FOUND,
-      );
-    }
-
-    const usuario = await this.usuarioRepository.findOne({
-      where: { id: usuarioId },
-      relations: ['albums'],
-    });
-    if (!usuario) {
-      throw new BusinessLogicException(
-        'Usuario was not found',
-        BusinessError.NOT_FOUND,
-      );
-    }
-
-
-    album.usuarios.push(usuario);
 
     return await this.albumRepository.save(album);
-  }
+    }
+
+    async update(id: string, album: AlbumEntity): Promise<AlbumEntity> {
+        const persistedAlbum: AlbumEntity = await this.albumRepository.findOne({where:{id}});
+        if (!persistedAlbum)
+          throw new BusinessLogicException("album  was not found", BusinessError.NOT_FOUND);
+        album.id = id; 
+        return await this.albumRepository.save(album);
+    }
+    
+    async delete(id: string) {
+        const album: AlbumEntity = await this.albumRepository.findOne({where:{id}, relations: ["fotos"] });
+        if (!album)
+          throw new BusinessLogicException("album  was not found", BusinessError.NOT_FOUND);
+
+        if (album.fotos && album.fotos.length > 0) {
+            throw new BusinessLogicException("Cannot delete the album because it has associated photo", BusinessError.INVALID_OPERATION);
+        }
+     
+        await this.albumRepository.remove(album);
+    }
+
+
+
 }
